@@ -8,12 +8,12 @@ clc;
 params = parameters();
 ctrlOptions = control_options();
 strType = {'constant','increase','decrease'};
-tSpan = [0,5];
+tSpan = 0:0.01:5;
 F1Min = max(20,params(10));
 F1Range = 10;
 % simulate and save data
 samples = {};
-num_samples = 100;
+num_samples = 1;
 for i = 1:num_samples
     disp("generate data for "+num2str(i)+"th sample.");
     ctrlOptions.fMax = [F1Min;0]+rand(2,1).*[F1Range;0]; % random max forces
@@ -22,9 +22,9 @@ for i = 1:num_samples
     fname=['data/input',num2str(i),'.mat'];
     save(fname, 'state');
     samples{end+1} = fname;
-    % plot_states(y(:,1),y(:,4:9));
-    % plot_forces(y(:,1),y(:,2),y(:,10));
 end
+plot_states(y(:,1),y(:,4:9));
+plot_forces(y(:,1),y(:,2),y(:,10));
 samples = reshape(samples,[],1); % make it row-based
 save('trainingData.mat','samples');
 

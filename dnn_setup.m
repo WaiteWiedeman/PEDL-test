@@ -25,7 +25,7 @@ for i = 1:numSamples
         end
     end
 end
-disp([num2str(length(xTrain)),' samples are generated for training.'])
+%disp([num2str(length(xTrain)),' samples are generated for training.'])
 xTrain = xTrain';
 yTrain = yTrain';
 
@@ -63,10 +63,10 @@ layers = [
 layers = layerGraph(layers);
 
 % Create options
-miniBatchSize = params.miniBatchSize;
-InitialLearnRate = params.InitialLearnRate;
-LearnRateDropFactor = params.LearnRateDropFactor;
-options = trainingOptions("adam",MaxEpochs=maxEpochs,Plots="training-progress",...
+miniBatchSize = 200; % params.miniBatchSize;
+InitialLearnRate = 1e-3; % params.InitialLearnRate;
+LearnRateDropFactor = 0.2; % params.LearnRateDropFactor;
+options = trainingOptions("adam",MaxEpochs=maxEpochs,Verbose=false,Plots="training-progress",...
     InitialLearnRate=InitialLearnRate,LearnRateSchedule="piecewise",LearnRateDropFactor=LearnRateDropFactor,...
     LearnRateDropPeriod=10,ValidationData={xVal,yVal},MiniBatchSize=miniBatchSize);
 
