@@ -71,10 +71,11 @@ dsVal = combine(dsState, dsTime, dsLabel);
 numLayers = params.numLayers;
 numNeurons = params.numNeurons;
 dropoutProb = params.dropoutProb;
+numHidden = params.numHidden;
 numStates = 6; % 6-dim states in the first second
 layers = [
     sequenceInputLayer(numStates+1)
-    lstmLayer(32,OutputMode="last")
+    lstmLayer(numHidden,OutputMode="last")
     concatenationLayer(1,2,Name="cat")];
 for i = 1:numLayers-1
     layers = [
