@@ -3,7 +3,7 @@ function [dsTrain,layers,options] = lstm_setup(params)
 % settings
 ds = load('trainingData.mat');
 numSamples = params.numSamples;
-maxEpochs = 50;
+maxEpochs = 60;
 seqSteps = params.seqSteps;
 
 % preprocess data for training
@@ -77,11 +77,11 @@ layers = [
     sequenceInputLayer(numStates+1)
     lstmLayer(numHidden,OutputMode="last")
     concatenationLayer(1,2,Name="cat")];
-for i = 1:numLayers-1
+for i = 1:numLayers
     layers = [
         layers
         fullyConnectedLayer(numNeurons)
-        reluLayer
+        eluLayer %reluLayer
         dropoutLayer(dropoutProb)]; 
 end
 layers = [

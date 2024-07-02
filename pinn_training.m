@@ -7,7 +7,7 @@ output.executionEnvironment = "auto";
 % settings
 ds = load('trainingData.mat');
 numSamples = params.numSamples;
-maxEpochs = 50;
+maxEpochs = 60;
 
 % generate data
 % Feature data: 4-D initial state x0 + time interval
@@ -51,11 +51,11 @@ numLayers = params.numLayers;
 numNeurons = params.numNeurons;
 dropoutProb = params.dropoutProb;
 layers = featureInputLayer(numStates+1);
-for i = 1:numLayers-1
+for i = 1:numLayers
     layers = [
         layers
         fullyConnectedLayer(numNeurons)
-        reluLayer
+        eluLayer %reluLayer
         dropoutLayer(dropoutProb)]; 
 end
 layers = [
@@ -143,6 +143,7 @@ function [loss, gradients, state] = modelLoss(net,X,T)
     dataLoss = l2loss(Y,T);
    
     % compute gradients using automatic differentiation
+    % predict
     q1 = Y(1,:);
     q2 = Y(2,:);
     q1d = Y(3,:);
@@ -155,9 +156,25 @@ function [loss, gradients, state] = modelLoss(net,X,T)
     % q2d = q2X(5,:); 
     q1dd = q1dX(5,:);
     q2dd = q2dX(5,:);
+
+    % target
+    q1T = T(1,:);
+    q2T = T(2,:);
+    q1dT = T(3,:);
+    q2dT = T(4,:);
+    % q1X = dlgradient(sum(q1,'all'), X);
+    % q2X = dlgradient(sum(q2,'all'), X);
+    q1dXT = dlgradient(sum(q1dT,'all'), X);
+    q2dXT = dlgradient(sum(q2dT,'all'), X);
+    % q1d = q1X(5,:);
+    % q2d = q2X(5,:); 
+    q1ddT = q1dXT(5,:);
+    q2ddT = q2dXT(5,:);
+
     f = physics_law([q1;q2],[q1d;q2d],[q1dd;q2dd]);
-    zeroTarget = zeros(size(f),"like",f);
-    physicLoss = l2loss(f,zeroTarget);
+    fT = physics_law([q1T;q2T],[q1dT;q2dT],[q1ddT;q2ddT]);
+    %zeroTarget = zeros(size(f),"like",f);
+    physicLoss = l2loss(f,fT);
     
     % total loss
     ctrlOptions = control_options();

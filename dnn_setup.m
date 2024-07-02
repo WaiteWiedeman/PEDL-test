@@ -3,7 +3,7 @@ function [xTrain,yTrain,layers,options] = dnn_setup(params)
 % settings
 ds = load('trainingData.mat');
 numSamples = params.numSamples;
-maxEpochs = 50;
+maxEpochs = 60;
 
 % generate data
 % Feature data: 6-D initial state x0 + time interval
@@ -49,11 +49,11 @@ numNeurons = params.numNeurons;
 dropoutProb = params.dropoutProb;
 numStates = 6; % 6-dim states in the first second
 layers = featureInputLayer(numStates+1);
-for i = 1:numLayers-1
+for i = 1:numLayers
     layers = [
         layers
         fullyConnectedLayer(numNeurons)
-        reluLayer
+        eluLayer %reluLayer
         dropoutLayer(dropoutProb)]; 
 end
 layers = [

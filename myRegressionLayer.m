@@ -22,7 +22,9 @@ classdef myRegressionLayer < nnet.layer.RegressionLayer ...
             dataLoss = mean((T-Y).^2,'all');
             % physics loss
             f = physics_law(Y(1:2,:),Y(3:4,:),Y(5:6,:));
-            physicLoss = mean(f.^2,'all');
+            fT = physics_law(T(1:2,:),T(3:4,:),T(5:6,:));
+            diff = f - fT;
+            physicLoss = mean(diff.^2,'all');
             % final loss, combining data loss and physics loss
             ctrlOptions = control_options();
             loss = (1.0-ctrlOptions.alpha)*dataLoss + ctrlOptions.alpha*physicLoss;
