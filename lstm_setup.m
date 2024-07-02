@@ -28,23 +28,44 @@ for i=1:numSamples
         end
     end
 end
-disp([num2str(length(times)),' samples are generated for training.'])
+%disp([num2str(length(times)),' samples are generated for training.'])
 states = reshape(states,[],1);
 times = times';
 labels = labels';
 
-% combine a datastore for training
-miniBatchSize = 200; % params.miniBatchSize;
-dsState = arrayDatastore(states,'OutputType',"same",'ReadSize',miniBatchSize);
-dsTime = arrayDatastore(times,'ReadSize',miniBatchSize);
-dsLabel = arrayDatastore(labels,'ReadSize',miniBatchSize);
-dsDataset = combine(dsState, dsTime, dsLabel);
-
 % Split test and validation data
-training_percent = 0.9;
-splitIndices = splitlabels(dsDataset,training_percent,'UnderlyingDatastoreIndex',3);
-dsTrain = subset(dsDataset,splitIndices{1});
-dsVal = subset(dsDataset,splitIndices{2});
+training_percent = 0.90;
+size = length(times);
+indices = randperm(size);
+num_train = round(size*training_percent);
+train_indices = indices(1:num_train);
+test_indices = indices(num_train+1:end);
+xTrain = {};
+for id = 1:length(train_indices)
+    xTrain{id} = states{train_indices(id)};
+end
+xTrain = reshape(xTrain,[],1);
+xVal = {};
+for id = 1:length(test_indices)
+    xVal{id} = states{test_indices(id)};
+end
+xVal = reshape(xVal,[],1);
+tTrain = times(train_indices);
+yTrain = labels(train_indices,:);
+tVal = times(test_indices);
+yVal = labels(test_indices,:);
+
+% combine a datastore for training
+miniBatchSize = 200;
+dsState = arrayDatastore(xTrain,'OutputType',"same",'ReadSize',miniBatchSize);
+dsTime = arrayDatastore(tTrain,'ReadSize',miniBatchSize);
+dsLabel = arrayDatastore(yTrain,'ReadSize',miniBatchSize);
+dsTrain = combine(dsState, dsTime, dsLabel);
+
+dsState = arrayDatastore(xVal,'OutputType',"same",'ReadSize',miniBatchSize);
+dsTime = arrayDatastore(tVal,'ReadSize',miniBatchSize);
+dsLabel = arrayDatastore(yVal,'ReadSize',miniBatchSize);
+dsVal = combine(dsState, dsTime, dsLabel);
 
 % make dnn and train 
 numLayers = params.numLayers;
