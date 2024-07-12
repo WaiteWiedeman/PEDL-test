@@ -2,8 +2,8 @@ function [dsTrain,layers,options] = lstm_setup(params)
 
 % settings
 ds = load('trainingData.mat');
-numSamples = params.numSamples;
-maxEpochs = 50;
+numSamples = 250; % params.numSamples;
+maxEpochs = 60;
 seqSteps = params.seqSteps;
 
 % preprocess data for training
@@ -40,14 +40,16 @@ indices = randperm(size);
 num_train = round(size*training_percent);
 train_indices = indices(1:num_train);
 test_indices = indices(num_train+1:end);
-xTrain = cell(length(train_indices),1);
+xTrain = {};
 for id = 1:length(train_indices)
     xTrain{id} = states{train_indices(id)};
 end
-xVal = cell(length(test_indices),1);
+xTrain = reshape(xTrain,[],1);
+xVal = {};
 for id = 1:length(test_indices)
     xVal{id} = states{test_indices(id)};
 end
+xVal = reshape(xVal,[],1);
 tTrain = times(train_indices);
 yTrain = labels(train_indices,:);
 tVal = times(test_indices);
@@ -69,16 +71,17 @@ dsVal = combine(dsState, dsTime, dsLabel);
 numLayers = params.numLayers;
 numNeurons = params.numNeurons;
 dropoutProb = params.dropoutProb;
+numHidden = params.numHidden;
 numStates = 6; % 6-dim states in the first second
 layers = [
     sequenceInputLayer(numStates+1)
-    lstmLayer(32,OutputMode="last")
+    lstmLayer(numHidden,OutputMode="last")
     concatenationLayer(1,2,Name="cat")];
-for i = 1:numLayers-1
+for i = 1:numLayers
     layers = [
         layers
         fullyConnectedLayer(numNeurons)
-        reluLayer
+        eluLayer %reluLayer
         dropoutLayer(dropoutProb)]; 
 end
 layers = [

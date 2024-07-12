@@ -1,0 +1,115 @@
+%% Description
+% Test environment for trained models
+
+close all;
+clear; 
+clc;
+
+%% settings
+params = parameters();
+tSpan = 0:0.01:10;
+
+tForceStop = 1;
+ctrlOptions = control_options();
+
+ds = load('trainingData.mat');
+numSamples = length(ds.samples);
+modelFile = "best_dnn_models.mat";
+maxEpochs = 50;
+F1Min = max(20,params(10));
+Fmax = 10;
+
+%% Test 1
+net = load(modelFile).best_train_RMSE;
+ctrlOptions.fMax = [F1Min+Fmax;0];
+y = sdpm_simulation(tSpan,ctrlOptions);
+t = y(:,1);
+x = y(:,4:9);
+initIdx = find(t >= tForceStop,1,'first');
+t0 = t(initIdx);
+x0 = x(initIdx,:);
+% prediction
+tp = t(initIdx+1:end);
+xp = zeros(length(tp),6);
+for i = 1:length(tp)
+    xp(i,:) = predict(net,[x0,tp(i)-t0]);
+end
+rmse = root_square_err(1:length(xp)-500,x(initIdx+1:end,:),xp);
+titletext = {"best training RMSE", "Test RMSE: " + num2str(mean(rmse,"all"))};
+plot_compared_states(t,x,tp,xp,titletext)
+
+%% Test 2
+net = load(modelFile).best_train_loss;
+ctrlOptions.fMax = [F1Min+Fmax;0];
+y = sdpm_simulation(tSpan,ctrlOptions);
+t = y(:,1);
+x = y(:,4:9);
+initIdx = find(t >= tForceStop,1,'first');
+t0 = t(initIdx);
+x0 = x(initIdx,:);
+% prediction
+tp = t(initIdx+1:end);
+xp = zeros(length(tp),6);
+for i = 1:length(tp)
+    xp(i,:) = predict(net,[x0,tp(i)-t0]);
+end
+rmse = root_square_err(1:length(xp)-500,x(initIdx+1:end,:),xp);
+titletext = {"best training loss", "Test RMSE: " + num2str(mean(rmse,"all"))};
+plot_compared_states(t,x,tp,xp,titletext)
+
+%% Test 3
+net = load(modelFile).best_val_loss;
+ctrlOptions.fMax = [F1Min+Fmax;0];
+y = sdpm_simulation(tSpan,ctrlOptions);
+t = y(:,1);
+x = y(:,4:9);
+initIdx = find(t >= tForceStop,1,'first');
+t0 = t(initIdx);
+x0 = x(initIdx,:);
+% prediction
+tp = t(initIdx+1:end);
+xp = zeros(length(tp),6);
+for i = 1:length(tp)
+    xp(i,:) = predict(net,[x0,tp(i)-t0]);
+end
+rmse = root_square_err(1:length(xp)-500,x(initIdx+1:end,:),xp);
+titletext = {"best validation loss", "Test RMSE: " + num2str(mean(rmse,"all"))};
+plot_compared_states(t,x,tp,xp,titletext)
+
+%% Test 4
+net = load(modelFile).best_val_RMSE;
+ctrlOptions.fMax = [F1Min+Fmax;0];
+y = sdpm_simulation(tSpan,ctrlOptions);
+t = y(:,1);
+x = y(:,4:9);
+initIdx = find(t >= tForceStop,1,'first');
+t0 = t(initIdx);
+x0 = x(initIdx,:);
+% prediction
+tp = t(initIdx+1:end);
+xp = zeros(length(tp),6);
+for i = 1:length(tp)
+    xp(i,:) = predict(net,[x0,tp(i)-t0]);
+end
+rmse = root_square_err(1:length(xp)-500,x(initIdx+1:end,:),xp);
+titletext = {"best validation RMSE", "Test RMSE: " + num2str(mean(rmse,"all"))};
+plot_compared_states(t,x,tp,xp,titletext)
+
+%% Test 5
+net = load(modelFile).best_model_eval;
+ctrlOptions.fMax = [F1Min+Fmax;0];
+y = sdpm_simulation(tSpan,ctrlOptions);
+t = y(:,1);
+x = y(:,4:9);
+initIdx = find(t >= tForceStop,1,'first');
+t0 = t(initIdx);
+x0 = x(initIdx,:);
+% prediction
+tp = t(initIdx+1:end);
+xp = zeros(length(tp),6);
+for i = 1:length(tp)
+    xp(i,:) = predict(net,[x0,tp(i)-t0]);
+end
+rmse = root_square_err(1:length(xp)-500,x(initIdx+1:end,:),xp);
+titletext = {"best model evaluation", "Test RMSE: " + num2str(mean(rmse,"all"))};
+plot_compared_states(t,x,tp,xp,titletext)

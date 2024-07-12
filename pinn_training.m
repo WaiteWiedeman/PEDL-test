@@ -69,14 +69,14 @@ net = dlnetwork(layers);
 % plot(net)
 
 % training options
-monitor.Metrics = ["Loss"  "ValidationLoss" "TestAccuracy"];
-monitor.Info = ["LearnRate","IterationPerEpoch","MaximumIteration","Epoch","Iteration"];
+monitor.Metrics = ["Loss"  "ValidationLoss"];
+monitor.Info = ["LearnRate","IterationPerEpoch","MaximumIteration","Epoch","Iteration","TestAccuracy"];
 monitor.XLabel = "Epoch";
 
 % using stochastic gradient decent
 miniBatchSize = 200;
-learnRate = 0.001;
-learnRatedrop = 0.2;
+learnRate = 0.0001;
+learnRatedrop = 0.5;
 learnRateDropPeriod = 10;
 dataSize = size(yTrain,2);
 numBatches = floor(dataSize/miniBatchSize);
@@ -133,7 +133,7 @@ while epoch < maxEpochs && ~monitor.Stop
     output.trainedNet = net;
 end
 
-recordMetrics(monitor,iter,...
+updateInfo(monitor,...
         TestAccuracy=pinn_model_eval(net))
 
 % loss function
@@ -157,24 +157,10 @@ function [loss, gradients, state] = modelLoss(net,X,T)
     q1dd = q1dX(5,:);
     q2dd = q2dX(5,:);
 
-    % target
-    q1T = T(1,:);
-    q2T = T(2,:);
-    q1dT = T(3,:);
-    q2dT = T(4,:);
-    % q1X = dlgradient(sum(q1,'all'), X);
-    % q2X = dlgradient(sum(q2,'all'), X);
-    q1dXT = dlgradient(sum(q1dT,'all'), X);
-    q2dXT = dlgradient(sum(q2dT,'all'), X);
-    % q1d = q1X(5,:);
-    % q2d = q2X(5,:); 
-    q1ddT = q1dXT(5,:);
-    q2ddT = q2dXT(5,:);
-
     f = physics_law([q1;q2],[q1d;q2d],[q1dd;q2dd]);
-    fT = physics_law([q1T;q2T],[q1dT;q2dT],[q1ddT;q2ddT]);
-    %zeroTarget = zeros(size(f),"like",f);
-    physicLoss = l2loss(f,fT);
+    %fT = physics_law([q1T;q2T],[q1dT;q2dT],[q1ddT;q2ddT]);
+    zeroTarget = zeros(size(f),"like",f);
+    physicLoss = l2loss(f,zeroTarget);
     
     % total loss
     ctrlOptions = control_options();
