@@ -17,7 +17,7 @@ numSamples = length(ds.samples);
 modelFile = "best_dnn_models.mat";
 maxEpochs = 50;
 F1Min = max(20,params(10));
-Fmax = -5;
+Fmax = 15;
 
 %% Test 1
 net = load(modelFile).best_train_RMSE;
@@ -111,5 +111,5 @@ for i = 1:length(tp)
     xp(i,:) = predict(net,[x0,tp(i)-t0]);
 end
 rmse = root_square_err(1:length(xp)-tRMSE,x(initIdx+1:end,:),xp);
-titletext = {"best model evaluation", "Test RMSE through 5s: " + num2str(mean(rmse,"all")), "Force Input: " + num2str(ctrlOptions.fMax(1)) + " N"};
+titletext = {"best test accuracy", "Test RMSE through 5s: " + num2str(mean(rmse,"all")), "Force Input: " + num2str(ctrlOptions.fMax(1)) + " N"};
 plot_compared_states(t,x,tp,xp,titletext)

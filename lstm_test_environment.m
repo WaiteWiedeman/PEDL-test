@@ -15,7 +15,7 @@ numSamples = size(ds.samples,1);
 modelFile = "best_lstm_models.mat";
 maxEpochs = 50;
 F1Min = max(20,params(10));
-Fmax = 5;
+Fmax = 15;
 
 %% Test 1
 net = load(modelFile).best_train_RMSE;
@@ -35,7 +35,7 @@ for i = 1:length(tp)
     xp(i,:) = predict(net,combine(x0, arrayDatastore(tp(i)-t0,'ReadSize',200)));
 end
 rmse = root_square_err(1:length(xp)-tRMSE,x(initIdx+1:end,:),xp);
-titletext = {"best training RMSE", "Test RMSE through 5s: " + num2str(mean(rmse,"all"))};
+titletext = {"best training RMSE", "Test RMSE through 5s: " + num2str(mean(rmse,"all")), "Force Input: " + num2str(ctrlOptions.fMax(1)) + " N"};
 plot_compared_states(t,x,tp,xp,titletext)
 
 %% Test 2
@@ -56,7 +56,7 @@ for i = 1:length(tp)
     xp(i,:) = predict(net,combine(x0, arrayDatastore(tp(i)-t0,'ReadSize',200)));
 end
 rmse = root_square_err(1:length(xp)-tRMSE,x(initIdx+1:end,:),xp);
-titletext = {"best training loss", "Test RMSE through 5s: " + num2str(mean(rmse,"all"))};
+titletext = {"best training loss", "Test RMSE through 5s: " + num2str(mean(rmse,"all")), "Force Input: " + num2str(ctrlOptions.fMax(1)) + " N"};
 plot_compared_states(t,x,tp,xp,titletext)
 
 %% Test 3
@@ -77,7 +77,7 @@ for i = 1:length(tp)
     xp(i,:) = predict(net,combine(x0, arrayDatastore(tp(i)-t0,'ReadSize',200)));
 end
 rmse = root_square_err(1:length(xp)-tRMSE,x(initIdx+1:end,:),xp);
-titletext = {"best validation RMSE", "Test RMSE through 5s: " + num2str(mean(rmse,"all"))};
+titletext = {"best validation RMSE", "Test RMSE through 5s: " + num2str(mean(rmse,"all")), "Force Input: " + num2str(ctrlOptions.fMax(1)) + " N"};
 plot_compared_states(t,x,tp,xp,titletext)
 
 %% Test 4
@@ -98,7 +98,7 @@ for i = 1:length(tp)
     xp(i,:) = predict(net,combine(x0, arrayDatastore(tp(i)-t0,'ReadSize',200)));
 end
 rmse = root_square_err(1:length(xp)-tRMSE,x(initIdx+1:end,:),xp);
-titletext = {"best validation loss", "Test RMSE through 5s: " + num2str(mean(rmse,"all"))};
+titletext = {"best validation loss", "Test RMSE through 5s: " + num2str(mean(rmse,"all")), "Force Input: " + num2str(ctrlOptions.fMax(1)) + " N"};
 plot_compared_states(t,x,tp,xp,titletext)
 
 %% Test 5
@@ -119,5 +119,5 @@ for i = 1:length(tp)
     xp(i,:) = predict(net,combine(x0, arrayDatastore(tp(i)-t0,'ReadSize',200)));
 end
 rmse = root_square_err(1:length(xp)-tRMSE,x(initIdx+1:end,:),xp);
-titletext = {"best model evaluation", "Test RMSE through 5s: " + num2str(mean(rmse,"all"))};
+titletext = {"best test accuracy", "Test RMSE through 5s: " + num2str(mean(rmse,"all")), "Force Input: " + num2str(ctrlOptions.fMax(1)) + " N"};
 plot_compared_states(t,x,tp,xp,titletext)

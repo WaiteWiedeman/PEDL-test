@@ -17,7 +17,7 @@ numSamples = length(ds.samples);
 modelFile = "best_PINN_models.mat";
 maxEpochs = 50;
 F1Min = max(20,params(10));
-Fmax = 5;
+Fmax = 15;
 
 %% Test 1
 net = load(modelFile).best_val_loss.trainedNet;
